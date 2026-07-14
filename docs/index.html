@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{--navy:#15324a;--teal:#0f766e;--cyan:#ddf4f1;--gold:#f4c95d;--bg:#f5f7fa;--line:#d7dee7;--muted:#64748b}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial,sans-serif;color:#172b3d}
+    .hidden{display:none!important}.center{min-height:100vh;display:grid;place-items:center;padding:20px}
+    .login{width:min(420px,100%);background:#fff;padding:28px;border-radius:16px;box-shadow:0 12px 35px #15324a20}
+    h1{margin:0 0 8px;color:var(--navy);font-size:24px}.muted{color:var(--muted)}
+    input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+    label{display:block;font-weight:700;margin:12px 0 6px}button{border:0;border-radius:8px;padding:11px 16px;cursor:pointer;font-weight:700}
+    .primary{background:var(--teal);color:#fff;width:100%;margin-top:14px}.secondary{background:#e9eef4;color:var(--navy)}.danger{background:#fee2e2;color:#991b1b;padding:6px 9px}
+    header{background:var(--navy);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+    header h2{margin:0;font-size:18px}header button{padding:8px 12px}.wrap{max-width:1180px;margin:auto;padding:20px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#fff;padding:16px;border-radius:12px;border:1px solid var(--line)}
+    .card span{display:block;color:var(--muted);font-size:12px;font-weight:700}.card strong{display:block;margin-top:8px;font-size:22px;color:var(--navy)}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:18px;padding:18px}.panel h3{margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.span2{grid-column:span 2}.actions{display:flex;justify-content:flex-end;margin-top:14px}
+    table{border-collapse:collapse;width:100%;min-width:900px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf4f6;color:var(--navy)}
+    .tablebox{overflow:auto}.money{text-align:right;white-space:nowrap}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--cyan);color:var(--teal);font-size:12px;font-weight:700}
+    .error{color:#b91c1c;margin-top:10px}.ok{color:#047857;margin-top:10px}.loading{opacity:.55;pointer-events:none}
+    @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.span2{grid-column:auto}}
+
+    @media(max-width:600px){
+      body{font-size:16px}
+      .center{padding:12px;align-items:start;padding-top:9vh}
+      .login{padding:22px 18px;border-radius:14px}
+      header{padding:11px 12px;align-items:flex-start}
+      header h2{font-size:16px;line-height:1.3}
+      header small{display:block;margin-top:4px}
+      header button{flex:0 0 auto;font-size:13px;padding:8px 10px}
+      .wrap{padding:10px}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .card{padding:11px 9px;border-radius:10px;min-width:0}
+      .card span{font-size:10px;line-height:1.3;min-height:26px}
+      .card strong{font-size:17px;line-height:1.25;overflow-wrap:anywhere}
+      .panel{padding:13px 11px;margin-top:12px;border-radius:10px}
+      .panel h3{font-size:18px}
+      .grid{gap:7px}
+      label{margin-top:9px}
+      input,select,textarea{font-size:16px;min-height:46px}
+      .actions{margin-top:11px}
+      .actions .primary{width:100%!important;min-height:46px}
+      .tablebox{overflow:visible}
+      table{min-width:0;display:block}
+      thead{display:none}
+      tbody{display:block}
+      tr{display:block;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:5px 10px;box-shadow:0 2px 7px #15324a0d}
+      td{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px;border-bottom:1px dashed var(--line);padding:8px 2px;text-align:left;overflow-wrap:anywhere}
+      td::before{font-size:12px;font-weight:700;color:var(--muted)}
+      td:nth-child(1)::before{content:'Ngày'}
+      td:nth-child(2)::before{content:'Loại'}
+      td:nth-child(3)::before{content:'Nội dung'}
+      td:nth-child(4)::before{content:'Số tiền'}
+      td:nth-child(5)::before{content:'Người giao/chi'}
+      td:nth-child(6)::before{content:'Trạng thái'}
+      td:nth-child(7)::before{content:'Người nhập'}
+      td:nth-child(8)::before{content:'Thao tác'}
+      td:last-child{border-bottom:0}
+      td.money{text-align:left;white-space:normal;font-weight:700}
+      td:last-child button{margin:2px 4px 2px 0}
+      tbody tr td[colspan]{display:block;text-align:center}
+      tbody tr td[colspan]::before{content:none}
+    }
+    .bridge{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;left:-10px;top:-10px}
+  </style>
+</head>
+<body>
+  <section id="loginScreen" class="center">
+    <div class="login">
+      <h1>Sổ theo dõi tiền đề tài</h1>
+      <p class="muted">Nhập mã thành viên để tiếp tục.</p>
+      <label for="memberCode">Mã thành viên</label>
+      <input id="memberCode" type="password" autocomplete="current-password" placeholder="Nhập mã của bạn">
+      <button class="primary" onclick="login()">Đăng nhập</button>
+      <div id="loginMessage" class="error"></div>
+    </div>
+  </section>
+
+  <section id="app" class="hidden">
+    <header><div><h2 id="projectName">Sổ theo dõi tiền đề tài</h2><small id="userName"></small></div><button class="secondary" onclick="logout()">Đăng xuất</button></header>
+    <main class="wrap">
+      <div class="cards">
+        <div class="card"><span>TỔNG ĐÃ NHẬN</span><strong id="tongNhan">0 ₫</strong></div>
+        <div class="card"><span>ĐÃ GIAO / THANH TOÁN</span><strong id="daChi">0 ₫</strong></div>
+        <div class="card"><span>ĐANG GIỮ</span><strong id="dangGiu">0 ₫</strong></div>
+        <div class="card"><span>CHỜ XÁC NHẬN</span><strong id="duKien">0 ₫</strong></div>
+      </div>
+
+      <div class="panel">
+        <h3>Thêm giao dịch</h3>
+        <div class="grid">
+          <div><label>Ngày giao dịch</label><input id="ngay" type="date"></div>
+          <div><label>Loại</label><select id="loai" onchange="doiLoai()"><option>Chi</option><option>Thu</option></select></div>
+          <div><label>Trạng thái</label><select id="trangThai"></select></div>
+          <div class="span2"><label>Nội dung</label><input id="noiDung" placeholder="Ví dụ: In 3D kim loại"></div>
+          <div><label>Số tiền</label><input id="soTien" type="text" inputmode="numeric" autocomplete="off" placeholder="Ví dụ: 1,000,000" oninput="formatMoneyInput(this)"></div>
+          <div><label id="nguoiGiaoNhanLabel">Người nhận</label><select id="nguoiGiaoNhan" onchange="capNhatTrangThaiChi()"><option>Phạm Đình Tùng</option><option>Nguyễn Ngọc Bình</option><option>Tạ Đức Hải</option></select></div>
+          <div><label>Link chứng từ</label><input id="linkChungTu" type="url" placeholder="https://..."></div>
+          <div><label>Ghi chú</label><input id="ghiChu"></div>
+        </div>
+        <div class="actions"><button class="primary" style="width:auto" onclick="addTransaction()">Lưu giao dịch</button></div>
+        <div id="formMessage"></div>
+      </div>
+
+      <div class="panel"><h3>Lịch sử giao dịch</h3><div class="tablebox"><table><thead><tr><th>Ngày</th><th>Loại</th><th>Nội dung</th><th>Số tiền</th><th>Người giao / người chi</th><th>Trạng thái</th><th>Người nhập</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></div>
+    </main>
+  </section>
+
+  <iframe id="gasBridge" class="bridge" title="Kết nối dữ liệu" src="https://script.google.com/macros/s/AKfycbxiTebDq7SUvCnBlVMoNLeMNyizUx0ZSstop5Ysi4dGR6mFV4ZzIyuc22XZR7KCsdzl/exec?bridge=1"></iframe>
+
+  <script>
+    let token=sessionStorage.getItem('thuChiToken')||'';let currentUser=null;
+    const money=n=>new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(Number(n||0));
+    const bridge=document.getElementById('gasBridge');const pending=new Map();let bridgeReady=false;
+    window.addEventListener('message',event=>{const data=event.data||{};const googleOrigin=event.origin==='https://script.google.com'||event.origin.endsWith('.googleusercontent.com');if(!googleOrigin)return;if(data.channel==='thu-chi-bridge'&&data.ready){bridgeReady=true;return}if(data.channel!=='thu-chi-rpc'||!pending.has(data.id))return;const job=pending.get(data.id);clearTimeout(job.timer);pending.delete(data.id);data.ok?job.resolve(data.result):job.reject(new Error(data.error||'Không thể xử lý yêu cầu.'))});
+    function waitForBridge(){if(bridgeReady)return Promise.resolve();return new Promise((resolve,reject)=>{const started=Date.now();const timer=setInterval(()=>{if(bridgeReady){clearInterval(timer);resolve()}else if(Date.now()-started>12000){clearInterval(timer);reject(new Error('Không kết nối được máy chủ dữ liệu. Vui lòng tải lại trang.'))}},100)})}
+    async function gas(name,args=[]){await waitForBridge();const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(new Error('Yêu cầu quá thời gian. Vui lòng thử lại.'))},25000);pending.set(id,{resolve,reject,timer});bridge.contentWindow.postMessage({channel:'thu-chi-rpc',id,method:name,args},'*')})}
+    function busy(on){document.body.classList.toggle('loading',on)}
+    async function login(){const msg=document.getElementById('loginMessage');msg.textContent='';busy(true);try{const r=await gas('dangNhap',[document.getElementById('memberCode').value]);token=r.token;currentUser=r;sessionStorage.setItem('thuChiToken',token);showData(r.duLieu);}catch(e){msg.textContent=e.message}finally{busy(false)}}
+    function showData(d){currentUser=d.user;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userName').textContent=d.user.hoTen+' · '+d.user.quyen;document.getElementById('projectName').textContent=d.cauHinh.TenDeTai||'Sổ theo dõi tiền đề tài';renderSummary(d.tongQuan);renderRows(d.giaoDich);setToday();doiLoai()}
+    async function load(){try{showData(await gas('layDuLieuBanDau',[token]));}catch(e){sessionStorage.removeItem('thuChiToken');token='';document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('loginMessage').textContent=e.message}}
+    function renderSummary(x){['tongNhan','daChi','dangGiu','duKien'].forEach(k=>document.getElementById(k).textContent=money(x[k]))}
+    function renderRows(rows){const box=document.getElementById('rows');box.innerHTML=rows.map(r=>`<tr><td>${esc(r.ngayGiaoDich)}</td><td>${esc(r.loai)}</td><td>${esc(r.noiDung)}</td><td class="money">${money(r.soTien)}</td><td>${esc(r.nguoiGiaoNhan)}</td><td><span class="badge">${esc(r.trangThai)}</span></td><td>${esc(r.nguoiNhap)}</td><td>${rowActions(r)}</td></tr>`).join('')||'<tr><td colspan="8" class="muted">Chưa có giao dịch.</td></tr>'}
+    function rowActions(r){if(r.trangThai==='Đã hủy')return '';const hoanTat=['Đã thanh toán','Đã hoàn ứng'].includes(r.trangThai);const nhan=r.trangThai==='Đã ứng cá nhân'?'Xác nhận hoàn ứng':'Xác nhận thanh toán';const nut=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình'&&r.loai==='Chi'&&!hoanTat?'<button class="secondary" onclick="confirmPayment(\''+esc(r.maGD)+'\')">'+nhan+'</button> ':'';return nut+'<button class="danger" onclick="cancelTx(\''+esc(r.maGD)+'\')">Hủy</button>'}
+    function doiLoai(){const thu=document.getElementById('loai').value==='Thu';const nguoi=document.getElementById('nguoiGiaoNhan');const laBinh=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình';document.getElementById('nguoiGiaoNhanLabel').textContent=thu?'Người giao':'Người chi';nguoi.disabled=!thu&&!laBinh;if(!thu&&currentUser)nguoi.value=currentUser.hoTen;if(thu){document.getElementById('trangThai').innerHTML='<option>Đã nhận</option>'}else{capNhatTrangThaiChi()}}
+    function capNhatTrangThaiChi(){if(document.getElementById('loai').value!=='Chi')return;const laBinh=document.getElementById('nguoiGiaoNhan').value==='Nguyễn Ngọc Bình';document.getElementById('trangThai').innerHTML=(laBinh?['Đã thanh toán','Đã ứng cá nhân']:['Chưa giao tiền','Đã giao tiền']).map(x=>'<option>'+x+'</option>').join('')}
+    async function addTransaction(){const msg=document.getElementById('formMessage');msg.textContent='';busy(true);try{await gas('themGiaoDich',[token,{ngayGiaoDich:v('ngay'),loai:v('loai'),noiDung:v('noiDung'),soTien:parseMoney(v('soTien')),nguoiGiaoNhan:v('nguoiGiaoNhan'),trangThai:v('trangThai'),ghiChu:v('ghiChu'),linkChungTu:v('linkChungTu')}]);msg.className='ok';msg.textContent='Đã lưu giao dịch.';['noiDung','soTien','nguoiGiaoNhan','ghiChu','linkChungTu'].forEach(id=>document.getElementById(id).value='');await load();}catch(e){msg.className='error';msg.textContent=e.message}finally{busy(false)}}
+    async function cancelTx(ma){if(!confirm('Chuyển giao dịch này sang trạng thái Đã hủy?'))return;busy(true);try{await gas('huyGiaoDich',[token,ma]);await load();}catch(e){alert(e.message)}finally{busy(false)}}
+    async function confirmPayment(ma){busy(true);try{await gas('xacNhanThanhToan',[token,ma]);await load();}catch(e){alert(e.message)}finally{busy(false)}}
+    async function logout(){busy(true);try{await gas('dangXuat',[token])}catch(e){}finally{sessionStorage.removeItem('thuChiToken');token='';currentUser=null;document.getElementById('memberCode').value='';document.getElementById('loginMessage').textContent='';document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');busy(false);document.getElementById('memberCode').focus()}}
+    function formatMoneyInput(el){const digits=el.value.replace(/\D/g,'');el.value=digits?Number(digits).toLocaleString('en-US'):''}function parseMoney(value){return Number(String(value||'').replace(/,/g,''))}function setToday(){if(!v('ngay'))document.getElementById('ngay').value=new Date().toISOString().slice(0,10)}function v(id){return document.getElementById(id).value}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    document.getElementById('memberCode').addEventListener('keydown',e=>{if(e.key==='Enter')login()});if(token)load();else setToday();
+  </script>
+</body>
+</html>
+
