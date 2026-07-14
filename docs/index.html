@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     :root{--navy:#15324a;--teal:#0f766e;--cyan:#ddf4f1;--gold:#f4c95d;--bg:#f5f7fa;--line:#d7dee7;--muted:#64748b}
@@ -114,10 +114,10 @@
   <script>
     let token=sessionStorage.getItem('thuChiToken')||'';let currentUser=null;
     const money=n=>new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(Number(n||0));
-    const bridge=document.getElementById('gasBridge');const pending=new Map();let bridgeReady=false;
-    window.addEventListener('message',event=>{const data=event.data||{};const googleOrigin=event.origin==='https://script.google.com'||event.origin.endsWith('.googleusercontent.com');if(!googleOrigin)return;if(data.channel==='thu-chi-bridge'&&data.ready){bridgeReady=true;return}if(data.channel!=='thu-chi-rpc'||!pending.has(data.id))return;const job=pending.get(data.id);clearTimeout(job.timer);pending.delete(data.id);data.ok?job.resolve(data.result):job.reject(new Error(data.error||'Không thể xử lý yêu cầu.'))});
+    const bridge=document.getElementById('gasBridge');const pending=new Map();let bridgeReady=false;let bridgeWindow=null;
+    window.addEventListener('message',event=>{const data=event.data||{};const googleOrigin=event.origin==='https://script.google.com'||event.origin.endsWith('.googleusercontent.com');if(!googleOrigin)return;if(data.channel==='thu-chi-bridge'&&data.ready){bridgeWindow=event.source;bridgeReady=true;return}if(data.channel!=='thu-chi-rpc'||!pending.has(data.id))return;const job=pending.get(data.id);clearTimeout(job.timer);pending.delete(data.id);data.ok?job.resolve(data.result):job.reject(new Error(data.error||'Không thể xử lý yêu cầu.'))});
     function waitForBridge(){if(bridgeReady)return Promise.resolve();return new Promise((resolve,reject)=>{const started=Date.now();const timer=setInterval(()=>{if(bridgeReady){clearInterval(timer);resolve()}else if(Date.now()-started>12000){clearInterval(timer);reject(new Error('Không kết nối được máy chủ dữ liệu. Vui lòng tải lại trang.'))}},100)})}
-    async function gas(name,args=[]){await waitForBridge();const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(new Error('Yêu cầu quá thời gian. Vui lòng thử lại.'))},25000);pending.set(id,{resolve,reject,timer});bridge.contentWindow.postMessage({channel:'thu-chi-rpc',id,method:name,args},'*')})}
+    async function gas(name,args=[]){await waitForBridge();const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(new Error('Yêu cầu quá thời gian. Vui lòng thử lại.'))},25000);pending.set(id,{resolve,reject,timer});bridgeWindow.postMessage({channel:'thu-chi-rpc',id,method:name,args},'*')})}
     function busy(on){document.body.classList.toggle('loading',on)}
     async function login(){const msg=document.getElementById('loginMessage');msg.textContent='';busy(true);try{const r=await gas('dangNhap',[document.getElementById('memberCode').value]);token=r.token;currentUser=r;sessionStorage.setItem('thuChiToken',token);showData(r.duLieu);}catch(e){msg.textContent=e.message}finally{busy(false)}}
     function showData(d){currentUser=d.user;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userName').textContent=d.user.hoTen+' · '+d.user.quyen;document.getElementById('projectName').textContent=d.cauHinh.TenDeTai||'Sổ theo dõi tiền đề tài';renderSummary(d.tongQuan);renderRows(d.giaoDich);setToday();doiLoai()}
@@ -136,4 +136,3 @@
   </script>
 </body>
 </html>
-

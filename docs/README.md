@@ -11,7 +11,7 @@ Thư mục này chứa website tĩnh để đăng trực tiếp lên GitHub Page
 5. Chọn nhánh `main`, thư mục `/docs`, rồi nhấn **Save**.
 6. Chờ GitHub cung cấp địa chỉ dạng `https://ten-tai-khoan.github.io/ten-repository/`.
 
-Website giữ nguyên giao diện và nghiệp vụ hiện tại. Apps Script phiên bản 23 hoạt động như cầu nối dữ liệu ẩn; người dùng không nhìn thấy banner cảnh báo của Apps Script.
+Website giữ nguyên giao diện và nghiệp vụ hiện tại. Apps Script phiên bản 23 hoạt động như cầu nối dữ liệu ẩn; người dùng không nhìn thấy banner cảnh báo của Apps Script. Tệp `.nojekyll` không cần thiết vì website chỉ sử dụng HTML thuần.
 
 ## Lưu ý
 
