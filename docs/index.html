@@ -18,7 +18,30 @@
     .card span{display:block;color:var(--muted);font-size:12px;font-weight:700}.card strong{display:block;margin-top:8px;font-size:22px;color:var(--navy)}
     .panel{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:18px;padding:18px}.panel h3{margin:0 0 12px}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.span2{grid-column:span 2}.actions{display:flex;justify-content:flex-end;margin-top:14px}
-    table{border-collapse:collapse;width:100%;min-width:900px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf4f6;color:var(--navy)}
+    table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 1100px;
+  table-layout: fixed;
+}
+
+th, td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+/* Phân bổ độ rộng 8 cột */
+th:nth-child(1), td:nth-child(1) { width: 11%; white-space: nowrap; }
+th:nth-child(2), td:nth-child(2) { width: 6%; }
+th:nth-child(3), td:nth-child(3) { width: 26%; }
+th:nth-child(4), td:nth-child(4) { width: 13%; }
+th:nth-child(5), td:nth-child(5) { width: 14%; }
+th:nth-child(6), td:nth-child(6) { width: 12%; }
+th:nth-child(7), td:nth-child(7) { width: 11%; }
+th:nth-child(8), td:nth-child(8) { width: 7%; }th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf4f6;color:var(--navy)}
     .tablebox{overflow:auto}.money{text-align:right;white-space:nowrap}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--cyan);color:var(--teal);font-size:12px;font-weight:700}
     .error{color:#b91c1c;margin-top:10px}.ok{color:#047857;margin-top:10px}.loading{opacity:.55;pointer-events:none}
     .email-option{display:flex;justify-content:flex-end;margin-top:13px}.email-toggle{display:inline-flex;align-items:center;gap:9px;margin:0;font-weight:700;color:var(--navy);cursor:pointer}.email-toggle input{position:absolute;opacity:0;width:1px;height:1px}.email-switch{width:42px;height:24px;border-radius:999px;background:#cbd5e1;position:relative;transition:.2s}.email-switch::after{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0003;transition:.2s}.email-toggle input:checked+.email-switch{background:var(--teal)}.email-toggle input:checked+.email-switch::after{transform:translateX(18px)}
@@ -114,6 +137,15 @@
   <iframe id="gasBridge" class="bridge" title="Kết nối dữ liệu" src="https://script.google.com/macros/s/AKfycbxiTebDq7SUvCnBlVMoNLeMNyizUx0ZSstop5Ysi4dGR6mFV4ZzIyuc22XZR7KCsdzl/exec?bridge=1"></iframe>
 
   <script>
+    function formatDateVN(s) {
+  if (!s) return '';
+  const value = String(s);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y,m,d] = value.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  return value;
+}
     let token=sessionStorage.getItem('thuChiToken')||'';let currentUser=null;
     const money=n=>new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(Number(n||0));
     const bridge=document.getElementById('gasBridge');const pending=new Map();let bridgeReady=false;let bridgeWindow=null;
@@ -139,7 +171,7 @@
     };
     return parseDate(b.ngayGiaoDich)-parseDate(a.ngayGiaoDich);
   });
-  box.innerHTML=rows.map(r=>`<tr><td>${esc(r.ngayGiaoDich)}</td><td>${esc(r.loai)}</td><td>${esc(r.noiDung)}</td><td class="money">${money(r.soTien)}</td><td>${esc(r.nguoiGiaoNhan)}</td><td><span class="badge">${esc(r.trangThai)}</span></td><td>${esc(r.nguoiNhap)}</td><td>${rowActions(r)}</td></tr>`).join('')||'<tr><td colspan="8" class="muted">Chưa có giao dịch.</td></tr>'}
+  box.innerHTML=rows.map(r=>`<tr><td>${esc(formatDateVN(r.ngayGiaoDich))}</td><td>${esc(r.loai)}</td><td>${esc(r.noiDung)}</td><td class="money">${money(r.soTien)}</td><td>${esc(r.nguoiGiaoNhan)}</td><td><span class="badge">${esc(r.trangThai)}</span></td><td>${esc(r.nguoiNhap)}</td><td>${rowActions(r)}</td></tr>`).join('')||'<tr><td colspan="8" class="muted">Chưa có giao dịch.</td></tr>'}
     function rowActions(r){if(r.trangThai==='Đã hủy')return '';const hoanTat=['Đã thanh toán','Đã hoàn ứng'].includes(r.trangThai);const nhan=r.trangThai==='Đã ứng cá nhân'?'Xác nhận hoàn ứng':'Xác nhận thanh toán';const nut=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình'&&r.loai==='Chi'&&!hoanTat?'<button class="secondary" onclick="confirmPayment(\''+esc(r.maGD)+'\')">'+nhan+'</button> ':'';return nut+'<button class="danger" onclick="cancelTx(\''+esc(r.maGD)+'\')">Hủy</button>'}
     function doiLoai(){const thu=document.getElementById('loai').value==='Thu';const nguoi=document.getElementById('nguoiGiaoNhan');const laBinh=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình';document.getElementById('nguoiGiaoNhanLabel').textContent=thu?'Người giao':'Người chi';nguoi.disabled=!thu&&!laBinh;if(!thu&&currentUser)nguoi.value=currentUser.hoTen;if(thu){document.getElementById('trangThai').innerHTML='<option>Đã nhận</option>'}else{capNhatTrangThaiChi()}}
     function capNhatTrangThaiChi(){if(document.getElementById('loai').value!=='Chi')return;const laBinh=document.getElementById('nguoiGiaoNhan').value==='Nguyễn Ngọc Bình';document.getElementById('trangThai').innerHTML=(laBinh?['Đã thanh toán','Đã ứng cá nhân']:['Chưa giao tiền','Đã giao tiền']).map(x=>'<option>'+x+'</option>').join('')}
