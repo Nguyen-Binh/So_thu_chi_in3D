@@ -125,7 +125,21 @@
     function showData(d){currentUser=d.user;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userName').textContent=d.user.hoTen+' · '+d.user.quyen;document.getElementById('projectName').textContent=d.cauHinh.TenDeTai||'Sổ theo dõi tiền đề tài';renderSummary(d.tongQuan);renderRows(d.giaoDich);setToday();doiLoai()}
     async function load(){try{showData(await gas('layDuLieuBanDau',[token]));}catch(e){sessionStorage.removeItem('thuChiToken');token='';document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('loginMessage').textContent=e.message}}
     function renderSummary(x){['tongNhan','daChi','dangGiu','duKien'].forEach(k=>document.getElementById(k).textContent=money(x[k]))}
-    function renderRows(rows){const box=document.getElementById('rows');box.innerHTML=rows.map(r=>`<tr><td>${esc(r.ngayGiaoDich)}</td><td>${esc(r.loai)}</td><td>${esc(r.noiDung)}</td><td class="money">${money(r.soTien)}</td><td>${esc(r.nguoiGiaoNhan)}</td><td><span class="badge">${esc(r.trangThai)}</span></td><td>${esc(r.nguoiNhap)}</td><td>${rowActions(r)}</td></tr>`).join('')||'<tr><td colspan="8" class="muted">Chưa có giao dịch.</td></tr>'}
+    function renderRows(rows){
+  const box=document.getElementById('rows');
+  rows=[...rows].sort((a,b)=>{
+    const parseDate=s=>{
+      const v=String(s||'').trim();
+      if(/^\d{2}\/\d{2}\/\d{4}$/.test(v)){
+        const [d,m,y]=v.split('/');
+        return new Date(Number(y),Number(m)-1,Number(d)).getTime();
+      }
+      const t=Date.parse(v);
+      return Number.isNaN(t)?0:t;
+    };
+    return parseDate(b.ngayGiaoDich)-parseDate(a.ngayGiaoDich);
+  });
+  box.innerHTML=rows.map(r=>`<tr><td>${esc(r.ngayGiaoDich)}</td><td>${esc(r.loai)}</td><td>${esc(r.noiDung)}</td><td class="money">${money(r.soTien)}</td><td>${esc(r.nguoiGiaoNhan)}</td><td><span class="badge">${esc(r.trangThai)}</span></td><td>${esc(r.nguoiNhap)}</td><td>${rowActions(r)}</td></tr>`).join('')||'<tr><td colspan="8" class="muted">Chưa có giao dịch.</td></tr>'}
     function rowActions(r){if(r.trangThai==='Đã hủy')return '';const hoanTat=['Đã thanh toán','Đã hoàn ứng'].includes(r.trangThai);const nhan=r.trangThai==='Đã ứng cá nhân'?'Xác nhận hoàn ứng':'Xác nhận thanh toán';const nut=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình'&&r.loai==='Chi'&&!hoanTat?'<button class="secondary" onclick="confirmPayment(\''+esc(r.maGD)+'\')">'+nhan+'</button> ':'';return nut+'<button class="danger" onclick="cancelTx(\''+esc(r.maGD)+'\')">Hủy</button>'}
     function doiLoai(){const thu=document.getElementById('loai').value==='Thu';const nguoi=document.getElementById('nguoiGiaoNhan');const laBinh=currentUser&&currentUser.hoTen==='Nguyễn Ngọc Bình';document.getElementById('nguoiGiaoNhanLabel').textContent=thu?'Người giao':'Người chi';nguoi.disabled=!thu&&!laBinh;if(!thu&&currentUser)nguoi.value=currentUser.hoTen;if(thu){document.getElementById('trangThai').innerHTML='<option>Đã nhận</option>'}else{capNhatTrangThaiChi()}}
     function capNhatTrangThaiChi(){if(document.getElementById('loai').value!=='Chi')return;const laBinh=document.getElementById('nguoiGiaoNhan').value==='Nguyễn Ngọc Bình';document.getElementById('trangThai').innerHTML=(laBinh?['Đã thanh toán','Đã ứng cá nhân']:['Chưa giao tiền','Đã giao tiền']).map(x=>'<option>'+x+'</option>').join('')}
